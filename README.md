@@ -23,7 +23,7 @@ The system is designed for evolution: new inference methods can be added without
 │   Inference Engine          │
 │  ┌──────────────────────┐   │
 │  │ Method 1: Mock LLM   │   │
-│  │ Method 2: RAG (TBD)  │   │
+│  │ Method 2: Groq LLM   │   │
 │  │ Method 3: ... (TBD)  │   │
 │  └──────────────────────┘   │
 └────────┬────────────────────┘
@@ -31,11 +31,12 @@ The system is designed for evolution: new inference methods can be added without
          ▼
 ┌─────────────────┐
 │  Aggregation    │
+│  (Max Conf)     │
 └────────┬────────┘
          │
          ▼
 ┌─────────────────────────────┐
-│ Inferred Codes + Audit      │
+│ Codes + Provenance          │
 └─────────────────────────────┘
 ```
 
@@ -43,9 +44,9 @@ The system is designed for evolution: new inference methods can be added without
 
 1. **Pluggable Methods**: Abstract base class pattern allows multiple inference methods
 2. **Versioned Components**: All components track their version for reproducibility
-3. **Audit Trail**: Complete provenance metadata (input hash, timestamps, method versions)
+3. **Audit Trail**: Complete provenance metadata per code
 4. **Stable Schema**: Output schema supports evolution without breaking consumers
-5. **Uncertainty Handling**: Confidence scores at evidence and aggregated levels
+5. **Uncertainty Handling**: Confidence scores and thresholding
 
 ## Input Format
 
@@ -63,33 +64,41 @@ JSON array with one object per input policy:
 [
   {
     "row_index": 0,
-    "inferred_codes": [
+    "codes": [
       {
-        "code": "G0008",
-        "aggregated_confidence": 0.85,
-        "selected": true,
-        "justification": "Found 3 matching terms (influenza, vaccine, administration)..."
+        "code": "70551",
+        "confidence": 0.87,
+        "justification": "Policy discusses MRI brain imaging without contrast",
+        "provenance": {
+          "method": {
+            "name": "groq_llm",
+            "type": "llm",
+            "version": "1.0"
+          },
+          "model": {
+            "name": "llama-3.3-70b-versatile",
+            "provider": "groq",
+            "tokens_used": 1523
+          },
+          "reference_data": {
+            "hcpcs_version": "2026.01",
+            "hcpcs_description": "Magnetic resonance imaging brain without contrast"
+          },
+          "runtime": {
+            "inference_timestamp": "2026-02-16T14:22:00Z",
+            "pipeline_version": "1.0",
+            "run_id": "5c7a91ae-8623..."
+          },
+          "input": {
+            "policy_text_hash": "sha256:ddf04a913..."
+          }
+        }
       }
     ],
-    "evidence": [
-      {
-        "code": "G0008",
-        "code_type": "HCPCS",
-        "method_name": "mock_llm_reasoning",
-        "method_version": "1.0",
-        "raw_output": "...",
-        "normalized_confidence": 0.85,
-        "metadata": {...}
-      }
-    ],
-    "audit": {
-      "pipeline_version": "1.0",
-      "run_id": "abc-123-def-456",
-      "input_hash": "sha256...",
-      "timestamp": "2026-02-15T10:30:00.000000",
-      "methods_used": [...],
-      "num_codes_inferred": 1,
-      "num_codes_selected": 1
+    "summary": {
+      "total_codes_found": 1,
+      "confidence_threshold": 0.65,
+      "methods_used": ["groq_llm"]
     }
   }
 ]
@@ -107,45 +116,75 @@ pip install -r requirements.txt
 - `policy_snippets.csv` - Input policies (with `policy_text` column)
 - `hcpcs.csv` - HCPCS code reference data (with `code` and `description` columns)
 
+### Optional Files (for few-shot learning)
+
+- `policies_cleaned.csv` - Training policy data
+- `policies_cleaned_labels.csv` - Ground truth labels
+
 ### Execute
 ```bash
+# Mock method (keyword matching)
 python run_pipeline.py -input policy_snippets.csv -output inferred_codes.json
+
+# Groq LLM (requires GROQ_API_KEY)
+export GROQ_API_KEY="your_key_here"
+python run_pipeline.py -input policy_snippets.csv -output inferred_codes.json --use-groq
+
+# Ensemble (both methods)
+python run_pipeline.py -input policy_snippets.csv -output inferred_codes.json --ensemble
 ```
 
 ### Example
 ```bash
-# Process sample policies
 python run_pipeline.py -input policy_snippets.csv -output inferred_codes.json
 
 # Output:
 # Loading policies from policy_snippets.csv...
 # Loading HCPCS reference data...
 # Initializing inference engine...
-# Processing 100 policies...
+#   → Using Mock LLM (keyword matching)
+# Processing 2 policies...
+# 
+# Policy 1/2:
+#   → Found 3 codes above threshold
+# 
+# Policy 2/2:
+#   → Found 5 codes above threshold
+# 
 # ==================================================
 # Pipeline Complete!
 # ==================================================
-# Policies processed: 100
-# Total codes inferred: 247
-# Codes meeting threshold: 189
+# Policies processed: 2
+# Total codes above threshold: 8
 # Output saved to: inferred_codes.json
 # ==================================================
 ```
 
-## Current Implementation: Mock LLM Method
+## Current Implementation
 
-The current `MockLLMMethod` uses keyword matching to simulate LLM behavior:
+### Mock LLM Method
 
-1. Extracts keywords from policy text (removing stop words)
-2. Compares against HCPCS code descriptions
-3. Identifies codes with ≥2 matching keywords
-4. Assigns confidence scores based on number of matches
+Uses keyword matching with medical term recognition:
 
-**This is intentionally simple** to focus on system design. In production, this would be replaced with:
-- Real LLM API calls (GPT-4, Claude, etc.)
-- RAG (Retrieval Augmented Generation) with policy database
-- Embedding-based similarity search
-- Ensemble methods combining multiple approaches
+1. Extracts keywords from policy text (removes administrative content)
+2. Identifies medical terms (MRI, vaccine, surgery, etc.)
+3. Matches against HCPCS code descriptions
+4. Requires: 2+ matches AND 1+ medical term
+5. Assigns confidence based on match quality
+
+**This is intentionally simple** to focus on system design. In production, this would be replaced with real LLM inference.
+
+### Groq LLM Method
+
+Uses Llama 3.3 70B via Groq for semantic understanding:
+
+1. Automatically loads training examples if available (`policies_cleaned.csv`)
+2. Uses few-shot learning when training data exists
+3. Sends policy text + HCPCS codes to LLM
+4. LLM returns relevant codes with reasoning
+5. Validates codes against HCPCS reference
+
+**Training data detection is automatic** - no flags needed!
 
 ## Evolution: Supporting Multiple Methods
 
@@ -157,8 +196,9 @@ from src.methods.base_method import InferenceMethod
 from src.schemas import Evidence
 
 class RAGMethod(InferenceMethod):
-    def __init__(self, vector_store):
+    def __init__(self, vector_store, hcpcs_df):
         self.vector_store = vector_store
+        self.hcpcs_df = hcpcs_df
         self.method_name = "rag_retrieval"
         self.method_version = "1.0"
     
@@ -176,9 +216,9 @@ class RAGMethod(InferenceMethod):
 ```python
 # In run_pipeline.py
 mock_method = MockLLMMethod(hcpcs_df)
-rag_method = RAGMethod(vector_store)
+rag_method = RAGMethod(vector_store, hcpcs_df)
 
-engine = InferenceEngine(methods=[mock_method, rag_method])
+engine = InferenceEngine(methods=[mock_method, rag_method], hcpcs_df=hcpcs_df)
 ```
 
 ### 3. Output Schema Stays the Same!
@@ -186,20 +226,13 @@ engine = InferenceEngine(methods=[mock_method, rag_method])
 The output already tracks which method produced each piece of evidence:
 ```json
 {
-  "evidence": [
-    {
-      "code": "70551",
-      "method_name": "mock_llm_reasoning",  // From Mock
-      "method_version": "1.0",
-      "normalized_confidence": 0.85
-    },
-    {
-      "code": "70551",
-      "method_name": "rag_retrieval",  // From RAG
-      "method_version": "1.0",
-      "normalized_confidence": 0.92
+  "provenance": {
+    "method": {
+      "name": "rag_retrieval",
+      "type": "retrieval",
+      "version": "1.0"
     }
-  ]
+  }
 }
 ```
 
@@ -211,7 +244,7 @@ The aggregation layer combines evidence from all methods (taking max confidence)
 
 Configurable parameters in `src/config.py`:
 ```python
-CONFIDENCE_THRESHOLD = 0.65  # Minimum confidence to select a code
+CONFIDENCE_THRESHOLD = 0.65  # Minimum confidence to include a code
 PIPELINE_VERSION = "1.0"
 AGGREGATION_VERSION = "max_confidence_v1"
 REFERENCE_HCPCS_VERSION = "2026.01"
@@ -219,13 +252,11 @@ REFERENCE_HCPCS_VERSION = "2026.01"
 
 ## Future Enhancements
 
-- **Real LLM Integration**: Replace mock with GPT-4/Claude API calls
 - **RAG System**: Add vector database for policy retrieval
 - **Embedding Similarity**: Use sentence embeddings for semantic matching
 - **Ensemble Methods**: Weighted voting across multiple methods
 - **Confidence Calibration**: Train calibration models for better uncertainty estimates
 - **API Wrapper**: REST API for real-time inference
-- **Batch Processing**: Optimize for large-scale processing
 - **Evaluation Framework**: Precision/recall metrics against ground truth
 
 ## Project Structure
@@ -240,7 +271,8 @@ hcpcs_inference/
 │   │   └── policy_loader.py   # Load policy data
 │   ├── methods/
 │   │   ├── base_method.py     # Abstract base class for inference methods
-│   │   └── mock_llm_method.py # Mock implementation using keyword matching
+│   │   ├── mock_llm_method.py # Mock implementation using keyword matching
+│   │   └── groq_llm_method.py # Real LLM via Groq API
 │   └── pipeline/
 │       ├── inference_engine.py # Orchestrates inference methods
 │       └── aggregator.py       # Combines evidence into final codes
@@ -252,12 +284,10 @@ hcpcs_inference/
 ## Key Design Decisions
 
 ### 1. Text-Only Input
-The service accepts only policy text as input. No external identifiers (policy_id) are required. This makes the service:
+The service accepts only policy text as input. No external identifiers required. This makes the service:
 - Stateless and reusable
 - Independent of policy tracking systems
 - Suitable for real-time API deployment
-
-IDs are generated internally (via content hash or UUID) purely for audit purposes.
 
 ### 2. Evidence-Based Architecture
 Rather than having methods directly output "final answers," each method produces `Evidence` objects. This allows:
@@ -266,17 +296,18 @@ Rather than having methods directly output "final answers," each method produces
 - Debuggability: Trace why a code was selected
 
 ### 3. Confidence Thresholding
-Codes are marked as `selected` based on a confidence threshold (default: 0.65). This allows downstream consumers to:
-- Use high-confidence codes immediately
-- Review lower-confidence codes manually
-- Adjust threshold based on their risk tolerance
+Only codes above the threshold (default: 0.65) are included in the output. This allows:
+- Clean output with only confident predictions
+- Threshold can be adjusted in config
+- Consumer can apply additional filtering using confidence scores
 
-### 4. Comprehensive Audit Trail
-Every result includes:
-- `run_id`: Unique identifier for this inference run
-- `input_hash`: SHA-256 hash of input text for reproducibility
-- Version information: Pipeline, methods, data sources, aggregation strategy
-- Timestamp: When inference was performed
+### 4. Comprehensive Provenance
+Every code includes complete provenance:
+- Which method found it
+- What model was used (if LLM)
+- When it was inferred
+- Input hash for reproducibility
+- HCPCS reference version
 
 This enables:
 - Reproducing historical results
@@ -305,4 +336,4 @@ Proprietary - Policybot Assessment
 
 ## Contact
 
-For questions or issues, contact: hello@policybot.app
+For questions: hello@policybot.app

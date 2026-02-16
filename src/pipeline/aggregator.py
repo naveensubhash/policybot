@@ -1,19 +1,22 @@
 from typing import List, Dict
+import pandas as pd
 from src.schemas import Evidence, FinalCode
-from src.config import CONFIDENCE_THRESHOLD
+from src.config import CONFIDENCE_THRESHOLD, REFERENCE_HCPCS_VERSION
 
 
-def aggregate(evidences: List[Evidence]) -> List[FinalCode]:
+def aggregate(evidences: List[Evidence], hcpcs_df: pd.DataFrame) -> List[FinalCode]:
     """
     Aggregate evidence from multiple inference methods.
     
     Strategy: Max confidence aggregation
     - Groups evidence by code
     - Takes maximum confidence across all methods
-    - Selects codes meeting confidence threshold
+    - Only includes codes above confidence threshold
+    - Builds rich provenance metadata per code
     
     Args:
         evidences: List of Evidence objects from all methods
+        hcpcs_df: DataFrame with HCPCS codes and descriptions
         
     Returns:
         List of FinalCode objects with aggregated confidence scores
@@ -30,19 +33,62 @@ def aggregate(evidences: List[Evidence]) -> List[FinalCode]:
         # Take maximum confidence across all evidence for this code
         max_conf = max(ev.normalized_confidence for ev in ev_list)
         
-        # Select if confidence meets threshold
-        selected = max_conf >= CONFIDENCE_THRESHOLD
+        # FILTER: Only include codes above threshold
+        if max_conf < CONFIDENCE_THRESHOLD:
+            continue
         
-        # Use the justification from the highest-confidence evidence
+        # Get the best (highest confidence) evidence for this code
         best_evidence = max(ev_list, key=lambda e: e.normalized_confidence)
-        justification = best_evidence.raw_output
         
+        # Get code description from HCPCS reference
+        code_row = hcpcs_df[hcpcs_df['code'] == code]
+        code_description = ""
+        if not code_row.empty:
+            code_description = code_row.iloc[0]['description']
+        
+        # Build provenance metadata
+        method_type = "deterministic" if "mock" in best_evidence.method_name else "llm"
+        
+        provenance = {
+            "method": {
+                "name": best_evidence.method_name,
+                "type": method_type,
+                "version": best_evidence.method_version
+            },
+            "reference_data": {
+                "hcpcs_version": REFERENCE_HCPCS_VERSION,
+                "hcpcs_description": code_description
+            }
+        }
+        
+        # Add model info if this was an LLM method
+        if best_evidence.metadata.get("api_provider"):
+            # Real LLM method (Groq, OpenAI, etc.)
+            provenance["model"] = {
+                "name": best_evidence.metadata.get("model_name"),
+                "provider": best_evidence.metadata.get("api_provider"),
+                "tokens_used": best_evidence.metadata.get("total_tokens")
+            }
+        elif best_evidence.metadata.get("model_name"):
+            # Mock/deterministic method with model info
+            provenance["model"] = {
+                "name": best_evidence.metadata["model_name"],
+                "version": best_evidence.metadata.get("model_version"),
+                "type": "mock"
+            }
+        else:
+            # No model info available
+            provenance["model"] = None
+
+        
+        # Create FinalCode - NO 'selected' parameter!
         final_codes.append(
             FinalCode(
                 code=code,
+                code_description=code_description,
                 aggregated_confidence=max_conf,
-                selected=selected,
-                justification=justification
+                justification=best_evidence.raw_output,
+                provenance=provenance
             )
         )
     

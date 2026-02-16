@@ -16,13 +16,13 @@ class Evidence:
 @dataclass
 class FinalCode:
     code: str
+    code_description: str
     aggregated_confidence: float
-    selected: bool
     justification: str
+    provenance: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class PolicyInferenceResult:
     inferred_codes: List[FinalCode]
-    evidence: List[Evidence]
-    audit: Dict[str, Any]
+    metadata: Dict[str, Any]
