@@ -1,4 +1,4 @@
-# HCPCS Inference Service v1
+# HCPCS Inference Service
 
 ## Overview
 
@@ -276,3 +276,11 @@ methods.append(RAGMethod(vector_db, hcpcs_df))
 ```
 
 **Output schema unchanged** - v1 and v2 consumers continue working!
+## Future Enhancements
+
+- **REST API wrapper** - Deploy as microservice for real-time inference
+- **Streaming mode** - Process large batches incrementally
+- **RAG with vector database** - Retrieve similar historical policies
+- **Advanced ensemble aggregators** - Implement stacking, blending, or weighted voting strategies beyond simple averaging
+
+***Note: For assessment purposes, the current implementation focuses on core functionality. These enhancements represent production-grade improvements that would be prioritized based on deployment requirements and resource availability.***
