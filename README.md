@@ -5,9 +5,8 @@
 A modular HCPCS code inference pipeline that analyzes medical policy text and returns relevant procedure codes with confidence scores and full audit trails.
 
 **Key Features:**
-- Text-only input (no IDs required)
+- Text-only input
 - Pluggable inference methods
-- Confidence-based filtering
 - Complete provenance tracking
 - Schema evolution without breaking consumers
 
@@ -21,6 +20,58 @@ pip install -r requirements.txt
 python run_pipeline.py -input policy_snippets.csv -output inferred_codes.json
 ```
 
+
+### Setting Up Groq (Optional)
+
+The pipeline works out of the box with just keyword matching. If you want to use the LLM-based method for better accuracy, you'll need a Groq API key:
+
+1. Get your free API key at https://console.groq.com/
+2. Set it as an environment variable:
+
+**On Mac/Linux:**
+```bash
+export GROQ_API_KEY="your_api_key_here"
+```
+
+**On Windows (PowerShell):**
+```powershell
+$env:GROQ_API_KEY="your_api_key_here"
+```
+
+If the API key is set, the pipeline automatically uses both the Mock and Groq methods. If not set, it just uses Mock (keyword matching).
+
+
+
+## API Contract
+
+### High-Level API Flow
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Pipeline as run_pipeline.py
+    participant Engine as InferenceEngine
+    participant Mock as MockLLMMethod
+    participant Groq as DirectMatchGroq
+    participant Agg as Aggregator
+    
+    Client->>Pipeline: CSV with policy_text
+    Pipeline->>Engine: run(policy_text)
+    
+    Engine->>Mock: infer(policy_text)
+    Mock-->>Engine: List[Evidence]
+    
+    Engine->>Groq: infer(policy_text)
+    Groq-->>Engine: List[Evidence]
+    
+    Engine->>Agg: aggregate(all_evidence)
+    Agg-->>Engine: List[FinalCode]
+    
+    Engine-->>Pipeline: PolicyInferenceResult
+    Pipeline-->>Client: JSON output
+```
+
+
 ## Input Format
 
 CSV with `policy_text` column:
@@ -29,6 +80,8 @@ CSV with `policy_text` column:
 policy_text
 "Coverage for administration of influenza virus vaccine..."
 "MRI of the brain is covered when medically necessary..."
+.
+.
 ```
 
 ## Output Format
@@ -60,18 +113,6 @@ policy_text
   }
 ]
 ```
-
-## Architecture
-
-```
-Policy Text → Inference Methods → Aggregation → Final Codes + Provenance
-```
-
-**Components:**
-- **Inference Methods**: Pluggable algorithms that return Evidence objects
-- **Inference Engine**: Runs all methods and collects evidence
-- **Aggregator**: Combines evidence, takes max confidence, filters by threshold
-
 ## v1: Mock Method (Keyword Matching)
 
 **Implementation:** `src/methods/mock_llm_method.py`
@@ -121,11 +162,6 @@ export GROQ_API_KEY="your_key"
 2. Retrieve top 15 most similar codes
 3. Send to LLM for validation and reasoning
 4. LLM returns only truly relevant codes with decision traces
-
-**Key difference from v1:**
-- Adds `decision_trace` field (step-by-step reasoning)
-- Uses semantic understanding (not just keywords)
-- Filters false positives (high similarity ≠ relevance)
 
 **Example output:**
 ```json
@@ -194,35 +230,11 @@ flowchart TD
 - **Evidence**: Individual finding from a method (code + confidence + reasoning)
 - **FinalCode**: Aggregated result with best evidence and full provenance
 
-### Why v1 Consumers Don't Break
-
-**Output schema stays the same:**
-- ✅ Same `codes` array structure
-- ✅ Same required fields (code, confidence, justification)
-- ✅ New optional field: `decision_trace` (null for v1, array for v2)
-- ✅ `methods_used` shows which methods ran
-
-**v1 code continues working:**
-```python
-# v1 consumer
-for code in result['codes']:
-    print(code['code'])         # Works
-    print(code['confidence'])   # Works
-    # Ignores decision_trace if present
-```
-
-### Multi-Method Benefits
-
-When both methods run together:
-- **Complementary coverage** - Different methods find different codes
-- **Higher confidence** - Takes MAX across methods
-- **Quality validation** - LLM filters false positives
-- **Full transparency** - See reasoning from each method
 
 ## Project Structure
 
 ```
-hcpcs_inference/
+policybot/
 ├── src/
 │   ├── config.py
 │   ├── schemas.py
