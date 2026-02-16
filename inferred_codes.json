@@ -1,0 +1,200 @@
+[
+  {
+    "inferred_codes": [
+      {
+        "code": "77300",
+        "aggregated_confidence": 0.8,
+        "selected": true,
+        "justification": "Found 3 matching keywords (dose, plan, therapy) between policy text and HCPCS 77300: 'Radiation therapy dose plan'"
+      }
+    ],
+    "evidence": [
+      {
+        "code": "77300",
+        "code_type": "HCPCS",
+        "method_name": "mock_llm_reasoning",
+        "method_version": "1.0",
+        "raw_output": "Found 3 matching keywords (dose, plan, therapy) between policy text and HCPCS 77300: 'Radiation therapy dose plan'",
+        "normalized_confidence": 0.8,
+        "metadata": {
+          "model_name": "mock-gpt-4",
+          "model_version": "1.0",
+          "prompt_template_version": "1.0",
+          "matching_keywords": [
+            "therapy",
+            "plan",
+            "dose"
+          ],
+          "num_matches": 3
+        }
+      }
+    ],
+    "audit": {
+      "pipeline_version": "1.0",
+      "aggregation_version": "max_confidence_v1",
+      "run_id": "5d3a1178-37b3-4687-9fa7-305a8bb969ab",
+      "input_hash": "48a17e8a502a8e12fee926bc941d709034a92f3129a93c7d184b6ba7da535afa",
+      "reference_hcpcs_version": "2026.01",
+      "timestamp": "2026-02-16T01:20:11.390304",
+      "methods_used": [
+        {
+          "method_name": "mock_llm_reasoning",
+          "method_version": "1.0"
+        }
+      ],
+      "num_evidence_collected": 1,
+      "num_codes_inferred": 1,
+      "num_codes_selected": 1
+    },
+    "row_index": 0
+  },
+  {
+    "inferred_codes": [
+      {
+        "code": "93320",
+        "aggregated_confidence": 0.8,
+        "selected": true,
+        "justification": "Found 3 matching keywords (conjunction, exam, used) between policy text and HCPCS 93320: 'Doppler echo exam heart [if used in conjunction with 93303-93304]'"
+      },
+      {
+        "code": "93321",
+        "aggregated_confidence": 0.8,
+        "selected": true,
+        "justification": "Found 3 matching keywords (conjunction, exam, used) between policy text and HCPCS 93321: 'Doppler echo exam heart [if used in conjunction with 93303, 93304, 93308]'"
+      },
+      {
+        "code": "80061",
+        "aggregated_confidence": 0.8,
+        "selected": true,
+        "justification": "Found 3 matching keywords (billed, code, panel) between policy text and HCPCS 80061: 'Lipid panel [only when billed with ICD-10-CM code Z13.6]'"
+      },
+      {
+        "code": "82950",
+        "aggregated_confidence": 0.8,
+        "selected": true,
+        "justification": "Found 3 matching keywords (billed, code, test) between policy text and HCPCS 82950: 'Glucose test [only when billed with ICD-10-CM code Z13.1]'"
+      },
+      {
+        "code": "82951",
+        "aggregated_confidence": 0.8,
+        "selected": true,
+        "justification": "Found 3 matching keywords (billed, code, test) between policy text and HCPCS 82951: 'Glucose tolerance test (GTT) [only when billed with ICD-10-CM code Z13.1]'"
+      }
+    ],
+    "evidence": [
+      {
+        "code": "93320",
+        "code_type": "HCPCS",
+        "method_name": "mock_llm_reasoning",
+        "method_version": "1.0",
+        "raw_output": "Found 3 matching keywords (conjunction, exam, used) between policy text and HCPCS 93320: 'Doppler echo exam heart [if used in conjunction with 93303-93304]'",
+        "normalized_confidence": 0.8,
+        "metadata": {
+          "model_name": "mock-gpt-4",
+          "model_version": "1.0",
+          "prompt_template_version": "1.0",
+          "matching_keywords": [
+            "exam",
+            "used",
+            "conjunction"
+          ],
+          "num_matches": 3
+        }
+      },
+      {
+        "code": "93321",
+        "code_type": "HCPCS",
+        "method_name": "mock_llm_reasoning",
+        "method_version": "1.0",
+        "raw_output": "Found 3 matching keywords (conjunction, exam, used) between policy text and HCPCS 93321: 'Doppler echo exam heart [if used in conjunction with 93303, 93304, 93308]'",
+        "normalized_confidence": 0.8,
+        "metadata": {
+          "model_name": "mock-gpt-4",
+          "model_version": "1.0",
+          "prompt_template_version": "1.0",
+          "matching_keywords": [
+            "exam",
+            "used",
+            "conjunction"
+          ],
+          "num_matches": 3
+        }
+      },
+      {
+        "code": "80061",
+        "code_type": "HCPCS",
+        "method_name": "mock_llm_reasoning",
+        "method_version": "1.0",
+        "raw_output": "Found 3 matching keywords (billed, code, panel) between policy text and HCPCS 80061: 'Lipid panel [only when billed with ICD-10-CM code Z13.6]'",
+        "normalized_confidence": 0.8,
+        "metadata": {
+          "model_name": "mock-gpt-4",
+          "model_version": "1.0",
+          "prompt_template_version": "1.0",
+          "matching_keywords": [
+            "billed",
+            "code",
+            "panel"
+          ],
+          "num_matches": 3
+        }
+      },
+      {
+        "code": "82950",
+        "code_type": "HCPCS",
+        "method_name": "mock_llm_reasoning",
+        "method_version": "1.0",
+        "raw_output": "Found 3 matching keywords (billed, code, test) between policy text and HCPCS 82950: 'Glucose test [only when billed with ICD-10-CM code Z13.1]'",
+        "normalized_confidence": 0.8,
+        "metadata": {
+          "model_name": "mock-gpt-4",
+          "model_version": "1.0",
+          "prompt_template_version": "1.0",
+          "matching_keywords": [
+            "billed",
+            "code",
+            "test"
+          ],
+          "num_matches": 3
+        }
+      },
+      {
+        "code": "82951",
+        "code_type": "HCPCS",
+        "method_name": "mock_llm_reasoning",
+        "method_version": "1.0",
+        "raw_output": "Found 3 matching keywords (billed, code, test) between policy text and HCPCS 82951: 'Glucose tolerance test (GTT) [only when billed with ICD-10-CM code Z13.1]'",
+        "normalized_confidence": 0.8,
+        "metadata": {
+          "model_name": "mock-gpt-4",
+          "model_version": "1.0",
+          "prompt_template_version": "1.0",
+          "matching_keywords": [
+            "billed",
+            "code",
+            "test"
+          ],
+          "num_matches": 3
+        }
+      }
+    ],
+    "audit": {
+      "pipeline_version": "1.0",
+      "aggregation_version": "max_confidence_v1",
+      "run_id": "d6547396-650d-4740-8e7c-fb849d933931",
+      "input_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac",
+      "reference_hcpcs_version": "2026.01",
+      "timestamp": "2026-02-16T01:20:11.409921",
+      "methods_used": [
+        {
+          "method_name": "mock_llm_reasoning",
+          "method_version": "1.0"
+        }
+      ],
+      "num_evidence_collected": 5,
+      "num_codes_inferred": 5,
+      "num_codes_selected": 5
+    },
+    "row_index": 1
+  }
+]
