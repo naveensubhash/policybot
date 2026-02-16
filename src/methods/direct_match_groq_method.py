@@ -17,7 +17,7 @@ class DirectMatchGroqMethod(InferenceMethod):
     Process:
     1. Calculate similarity between policy text and HCPCS descriptions
     2. Get top K most similar codes
-    3. Send to LLM for validation and reasoning
+    3. Send to LLM for validation, reasoning, and decision trace
     
     No training data needed - works directly with HCPCS reference.
     """
@@ -46,7 +46,9 @@ class DirectMatchGroqMethod(InferenceMethod):
         # Initialize Groq client
         api_key = api_key or os.environ.get("GROQ_API_KEY")
         if not api_key:
-            raise ValueError("GROQ_API_KEY required")
+            raise ValueError(
+                "GROQ_API_KEY required. Get your key at https://console.groq.com/"
+            )
         
         self.client = Groq(api_key=api_key)
         
@@ -132,14 +134,25 @@ Task: Determine which of the above codes are truly relevant to this policy. For 
 1. The code
 2. Confidence (0.0 to 1.0) - how confident are you this code applies
 3. Brief reasoning - explain WHY this code is relevant
+4. Decision trace - step-by-step logic showing how you reached this conclusion
 
 Return ONLY a JSON array:
 [
-  {{"code": "XXXXX", "confidence": 0.85, "reasoning": "This code is relevant because..."}}
+  {{
+    "code": "XXXXX", 
+    "confidence": 0.85, 
+    "reasoning": "This code is relevant because...",
+    "decision_trace": [
+      "Identified key phrase 'MRI imaging' in policy text",
+      "Matched to HCPCS family 70551-70553 for brain MRI",
+      "Selected 70551 based on 'without contrast' specification"
+    ]
+  }}
 ]
 
 Important:
 - Only include codes that are clearly relevant to the policy
+- Decision trace should show your step-by-step reasoning (3-5 steps)
 - A high similarity score doesn't mean the code is relevant - use your medical knowledge
 - If none of the codes are relevant, return: []
 """
@@ -168,7 +181,7 @@ Important:
         
         Process:
         1. Find codes with similar descriptions to policy text
-        2. Send to LLM for validation and reasoning
+        2. Send to LLM for validation, reasoning, and decision trace
         """
         if not policy_text or not policy_text.strip():
             return []
@@ -239,6 +252,14 @@ Important:
                     confidence = float(item['confidence'])
                     reasoning = str(item['reasoning'])
                     
+                    # Extract decision trace
+                    decision_trace = item.get('decision_trace', None)
+                    if decision_trace and isinstance(decision_trace, list):
+                        # Clean up the trace
+                        decision_trace = [str(step).strip() for step in decision_trace]
+                    else:
+                        decision_trace = None
+                    
                     # Validate code
                     if code not in self.hcpcs_df['code'].values:
                         print(f"  ⚠️  Skipping invalid code: {code}")
@@ -256,6 +277,7 @@ Important:
                         method_version=self.method_version,
                         raw_output=reasoning,
                         normalized_confidence=confidence,
+                        decision_trace=decision_trace,
                         metadata={
                             "model_name": self.model,
                             "api_provider": "groq",

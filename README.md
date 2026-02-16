@@ -2,64 +2,37 @@
 
 ## Overview
 
-This project implements a modular, auditable HCPCS inference service that:
-- Accepts policy text as input
-- Infers relevant HCPCS codes using pluggable inference methods
-- Returns confidence scores for each code
-- Provides full audit trail and provenance metadata for reproducibility
+A modular HCPCS code inference pipeline that analyzes medical policy text and returns relevant procedure codes with confidence scores and full audit trails.
 
-The system is designed for evolution: new inference methods can be added without breaking existing consumers.
+**Key Features:**
+- Text-only input (no IDs required)
+- Pluggable inference methods
+- Confidence-based filtering
+- Complete provenance tracking
+- Schema evolution without breaking consumers
 
-## Architecture
+## Quick Start
 
-### Core Components
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Run pipeline
+python run_pipeline.py -input policy_snippets.csv -output inferred_codes.json
 ```
-┌─────────────────┐
-│  Policy Text    │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────────────────┐
-│   Inference Engine          │
-│  ┌──────────────────────┐   │
-│  │ Method 1: Mock LLM   │   │
-│  │ Method 2: Groq LLM   │   │
-│  │ Method 3: ... (TBD)  │   │
-│  └──────────────────────┘   │
-└────────┬────────────────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Aggregation    │
-│  (Max Conf)     │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────────────────┐
-│ Codes + Provenance          │
-└─────────────────────────────┘
-```
-
-### Design Principles
-
-1. **Pluggable Methods**: Abstract base class pattern allows multiple inference methods
-2. **Versioned Components**: All components track their version for reproducibility
-3. **Audit Trail**: Complete provenance metadata per code
-4. **Stable Schema**: Output schema supports evolution without breaking consumers
-5. **Uncertainty Handling**: Confidence scores and thresholding
 
 ## Input Format
 
-CSV file with a single `policy_text` column:
+CSV with `policy_text` column:
+
 ```csv
 policy_text
-"Coverage is provided for administration of influenza virus vaccine..."
-"Magnetic resonance imaging of the brain is covered when medically necessary..."
+"Coverage for administration of influenza virus vaccine..."
+"MRI of the brain is covered when medically necessary..."
 ```
 
 ## Output Format
 
-JSON array with one object per input policy:
 ```json
 [
   {
@@ -68,272 +41,226 @@ JSON array with one object per input policy:
       {
         "code": "70551",
         "confidence": 0.87,
-        "justification": "Policy discusses MRI brain imaging without contrast",
+        "justification": "Found 3 matching keywords (2 medical terms: mri, magnetic + resonance)...",
+        "decision_trace": null,
         "provenance": {
-          "method": {
-            "name": "groq_llm",
-            "type": "llm",
-            "version": "1.0"
-          },
-          "model": {
-            "name": "llama-3.3-70b-versatile",
-            "provider": "groq",
-            "tokens_used": 1523
-          },
-          "reference_data": {
-            "hcpcs_version": "2026.01",
-            "hcpcs_description": "Magnetic resonance imaging brain without contrast"
-          },
-          "runtime": {
-            "inference_timestamp": "2026-02-16T14:22:00Z",
-            "pipeline_version": "1.0",
-            "run_id": "5c7a91ae-8623..."
-          },
-          "input": {
-            "policy_text_hash": "sha256:ddf04a913..."
-          }
+          "method": {"name": "mock_llm_reasoning", "type": "deterministic", "version": "1.0"},
+          "model": {"name": "mock-gpt-4", "version": "1.0", "type": "mock"},
+          "reference_data": {"hcpcs_version": "2026.01"},
+          "runtime": {"timestamp": "2026-02-16T14:22:00Z", "run_id": "..."},
+          "input": {"policy_text_hash": "sha256:..."}
         }
       }
     ],
     "summary": {
       "total_codes_found": 1,
       "confidence_threshold": 0.65,
-      "methods_used": ["groq_llm"]
+      "methods_used": ["mock_llm_reasoning"]
     }
   }
 ]
 ```
 
-## Running the Pipeline
+## Architecture
 
-### Prerequisites
-```bash
-pip install -r requirements.txt
+```
+Policy Text → Inference Methods → Aggregation → Final Codes + Provenance
 ```
 
-### Required Files
+**Components:**
+- **Inference Methods**: Pluggable algorithms that return Evidence objects
+- **Inference Engine**: Runs all methods and collects evidence
+- **Aggregator**: Combines evidence, takes max confidence, filters by threshold
 
-- `policy_snippets.csv` - Input policies (with `policy_text` column)
-- `hcpcs.csv` - HCPCS code reference data (with `code` and `description` columns)
+## v1: Mock Method (Keyword Matching)
 
-### Optional Files (for few-shot learning)
+**Implementation:** `src/methods/mock_llm_method.py`
 
-- `policies_cleaned.csv` - Training policy data
-- `policies_cleaned_labels.csv` - Ground truth labels
+Uses keyword matching:
+1. Extract medical terms from policy text
+2. Match against HCPCS descriptions
+3. Require 2+ matches with 1+ medical term
+4. Calculate confidence based on match quality
 
-### Execute
-```bash
-# Mock method (keyword matching)
-python run_pipeline.py -input policy_snippets.csv -output inferred_codes.json
+**Characteristics:**
+- Fast, deterministic, no API costs
+- Good for explicit keyword matches
 
-# Groq LLM (requires GROQ_API_KEY)
-export GROQ_API_KEY="your_key_here"
-python run_pipeline.py -input policy_snippets.csv -output inferred_codes.json --use-groq
+## Schema Evolution: Adding Methods Without Breaking v1
 
-# Ensemble (both methods)
-python run_pipeline.py -input policy_snippets.csv -output inferred_codes.json --ensemble
-```
+To add a new LLM-based method, **only 3 lines of code** are needed:
 
-### Example
-```bash
-python run_pipeline.py -input policy_snippets.csv -output inferred_codes.json
-
-# Output:
-# Loading policies from policy_snippets.csv...
-# Loading HCPCS reference data...
-# Initializing inference engine...
-#   → Using Mock LLM (keyword matching)
-# Processing 2 policies...
-# 
-# Policy 1/2:
-#   → Found 3 codes above threshold
-# 
-# Policy 2/2:
-#   → Found 5 codes above threshold
-# 
-# ==================================================
-# Pipeline Complete!
-# ==================================================
-# Policies processed: 2
-# Total codes above threshold: 8
-# Output saved to: inferred_codes.json
-# ==================================================
-```
-
-## Current Implementation
-
-### Mock LLM Method
-
-Uses keyword matching with medical term recognition:
-
-1. Extracts keywords from policy text (removes administrative content)
-2. Identifies medical terms (MRI, vaccine, surgery, etc.)
-3. Matches against HCPCS code descriptions
-4. Requires: 2+ matches AND 1+ medical term
-5. Assigns confidence based on match quality
-
-**This is intentionally simple** to focus on system design. In production, this would be replaced with real LLM inference.
-
-### Groq LLM Method
-
-Uses Llama 3.3 70B via Groq for semantic understanding:
-
-1. Automatically loads training examples if available (`policies_cleaned.csv`)
-2. Uses few-shot learning when training data exists
-3. Sends policy text + HCPCS codes to LLM
-4. LLM returns relevant codes with reasoning
-5. Validates codes against HCPCS reference
-
-**Training data detection is automatic** - no flags needed!
-
-## Evolution: Supporting Multiple Methods
-
-The architecture already supports multiple inference methods. To add a new method:
-
-### 1. Implement the InferenceMethod Interface
+### Before (v1):
 ```python
-from src.methods.base_method import InferenceMethod
-from src.schemas import Evidence
-
-class RAGMethod(InferenceMethod):
-    def __init__(self, vector_store, hcpcs_df):
-        self.vector_store = vector_store
-        self.hcpcs_df = hcpcs_df
-        self.method_name = "rag_retrieval"
-        self.method_version = "1.0"
-    
-    def infer(self, policy_text: str) -> List[Evidence]:
-        # Retrieve similar policies
-        similar_policies = self.vector_store.search(policy_text, top_k=5)
-        
-        # Extract codes from similar policies
-        # ...
-        
-        return evidences
+# run_pipeline.py
+methods = []
+methods.append(MockLLMMethod(hcpcs_df))
 ```
 
-### 2. Add to Inference Engine
+### After (v2):
 ```python
-# In run_pipeline.py
-mock_method = MockLLMMethod(hcpcs_df)
-rag_method = RAGMethod(vector_store, hcpcs_df)
+# run_pipeline.py
+methods = []
+methods.append(MockLLMMethod(hcpcs_df))
 
-engine = InferenceEngine(methods=[mock_method, rag_method], hcpcs_df=hcpcs_df)
+# Add LLM method - that's it!
+if os.environ.get("GROQ_API_KEY"):
+    methods.append(DirectMatchGroqMethod(hcpcs_df))
 ```
 
-### 3. Output Schema Stays the Same!
+### v2: Direct-Match Groq Method (Similarity + LLM)
 
-The output already tracks which method produced each piece of evidence:
+**Setup:**
+```bash
+pip install groq scikit-learn
+export GROQ_API_KEY="your_key"
+```
+
+**How it works:**
+1. Calculate TF-IDF similarity between policy text and HCPCS descriptions
+2. Retrieve top 15 most similar codes
+3. Send to LLM for validation and reasoning
+4. LLM returns only truly relevant codes with decision traces
+
+**Key difference from v1:**
+- Adds `decision_trace` field (step-by-step reasoning)
+- Uses semantic understanding (not just keywords)
+- Filters false positives (high similarity ≠ relevance)
+
+**Example output:**
 ```json
 {
+  "code": "70551",
+  "confidence": 0.92,
+  "decision_trace": [
+    "Identified key phrase 'MRI of the brain' in policy text",
+    "Examined HCPCS codes 70551-70553 for brain MRI",
+    "Policy specifies 'without contrast material'",
+    "Selected 70551 as exact match"
+  ],
   "provenance": {
-    "method": {
-      "name": "rag_retrieval",
-      "type": "retrieval",
-      "version": "1.0"
-    }
+    "method": {"name": "direct_match_groq", "type": "llm"},
+    "model": {"name": "llama-3.3-70b-versatile", "provider": "groq"}
   }
 }
 ```
 
-The aggregation layer combines evidence from all methods (taking max confidence).
 
-**V1 consumers continue to work without any changes.**
+##  Architecture
 
-## Configuration
+### System Flow Diagram
 
-Configurable parameters in `src/config.py`:
-```python
-CONFIDENCE_THRESHOLD = 0.65  # Minimum confidence to include a code
-PIPELINE_VERSION = "1.0"
-AGGREGATION_VERSION = "max_confidence_v1"
-REFERENCE_HCPCS_VERSION = "2026.01"
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'14px'}}}%%
+flowchart TD
+    Input["📄 Policy Text"]
+    
+    Input --> Engine["⚙️ Inference Engine"]
+    
+    Engine --> Mock["Mock Method"]
+    Engine --> Groq["Direct-Match Groq"]
+    
+    Mock --> MockSteps["• Extract keywords• Match HCPCS• Return Evidence"]
+    Groq --> GroqSteps["• TF-IDF similarity• Top 15 codes• LLM validation• Return Evidence"]
+    
+    MockSteps --> Evidence["All Evidence"]
+    GroqSteps --> Evidence
+    
+    Evidence --> Agg["🔄 Aggregator"]
+    
+    Agg --> AggLogic["• Group by code• MAX confidence• Filter ≥0.65"]
+    
+    AggLogic --> Output["📤 Final Output"]
+    
+    style Input fill:#E3F2FD,stroke:#1976D2,stroke-width:2px
+    style Engine fill:#FFF3E0,stroke:#F57C00,stroke-width:2px
+    style Mock fill:#F5F5F5,stroke:#616161,stroke-width:2px
+    style Groq fill:#F5F5F5,stroke:#616161,stroke-width:2px
+    style MockSteps fill:#FAFAFA,stroke:#9E9E9E,stroke-width:1px
+    style GroqSteps fill:#FAFAFA,stroke:#9E9E9E,stroke-width:1px
+    style Evidence fill:#E8F5E9,stroke:#388E3C,stroke-width:2px
+    style Agg fill:#FFF9C4,stroke:#F9A825,stroke-width:2px
+    style AggLogic fill:#FFFDE7,stroke:#FBC02D,stroke-width:1px
+    style Output fill:#F3E5F5,stroke:#7B1FA2,stroke-width:2px
 ```
 
-## Future Enhancements
 
-- **RAG System**: Add vector database for policy retrieval
-- **Embedding Similarity**: Use sentence embeddings for semantic matching
-- **Ensemble Methods**: Weighted voting across multiple methods
-- **Confidence Calibration**: Train calibration models for better uncertainty estimates
-- **API Wrapper**: REST API for real-time inference
-- **Evaluation Framework**: Precision/recall metrics against ground truth
+
+### Components
+
+- **Inference Methods**: Pluggable algorithms that implement `infer(text) → Evidence`
+- **Inference Engine**: Orchestrates methods, collects all evidence
+- **Aggregator**: Combines evidence (max confidence), filters by threshold
+- **Evidence**: Individual finding from a method (code + confidence + reasoning)
+- **FinalCode**: Aggregated result with best evidence and full provenance
+
+### Why v1 Consumers Don't Break
+
+**Output schema stays the same:**
+- ✅ Same `codes` array structure
+- ✅ Same required fields (code, confidence, justification)
+- ✅ New optional field: `decision_trace` (null for v1, array for v2)
+- ✅ `methods_used` shows which methods ran
+
+**v1 code continues working:**
+```python
+# v1 consumer
+for code in result['codes']:
+    print(code['code'])         # Works
+    print(code['confidence'])   # Works
+    # Ignores decision_trace if present
+```
+
+### Multi-Method Benefits
+
+When both methods run together:
+- **Complementary coverage** - Different methods find different codes
+- **Higher confidence** - Takes MAX across methods
+- **Quality validation** - LLM filters false positives
+- **Full transparency** - See reasoning from each method
 
 ## Project Structure
+
 ```
 hcpcs_inference/
 ├── src/
-│   ├── config.py              # Configuration constants
-│   ├── schemas.py             # Data structures (Evidence, FinalCode, etc.)
-│   ├── utils.py               # Utility functions (hashing, timestamps)
+│   ├── config.py
+│   ├── schemas.py
+│   ├── utils.py
 │   ├── data/
-│   │   ├── hcpcs_loader.py    # Load HCPCS reference data
-│   │   └── policy_loader.py   # Load policy data
+│   │   ├── hcpcs_loader.py
+│   │   └── policy_loader.py
 │   ├── methods/
-│   │   ├── base_method.py     # Abstract base class for inference methods
-│   │   ├── mock_llm_method.py # Mock implementation using keyword matching
-│   │   └── groq_llm_method.py # Real LLM via Groq API
+│   │   ├── base_method.py              # Abstract interface
+│   │   ├── mock_llm_method.py          # v1: Keyword matching
+│   │   └── direct_match_groq_method.py # v2: Similarity + LLM
 │   └── pipeline/
-│       ├── inference_engine.py # Orchestrates inference methods
-│       └── aggregator.py       # Combines evidence into final codes
-├── run_pipeline.py            # CLI entrypoint
-├── requirements.txt           # Python dependencies
-└── README.md                  # This file
+│       ├── inference_engine.py
+│       └── aggregator.py
+├── run_pipeline.py
+├── requirements.txt
+└── README.md
 ```
 
-## Key Design Decisions
+## Design Principles
 
-### 1. Text-Only Input
-The service accepts only policy text as input. No external identifiers required. This makes the service:
-- Stateless and reusable
-- Independent of policy tracking systems
-- Suitable for real-time API deployment
+1. **Modularity** - Each method implements simple `infer(text) → Evidence` interface
+2. **Extensibility** - Add methods by implementing base class
+3. **Auditability** - Complete provenance per code
+4. **Versioning** - Track pipeline, method, and data versions
+5. **Stability** - New methods add optional fields, don't break existing consumers
 
-### 2. Evidence-Based Architecture
-Rather than having methods directly output "final answers," each method produces `Evidence` objects. This allows:
-- Transparency: See reasoning from each method
-- Flexibility: Different aggregation strategies
-- Debuggability: Trace why a code was selected
+## Adding Future Methods
 
-### 3. Confidence Thresholding
-Only codes above the threshold (default: 0.65) are included in the output. This allows:
-- Clean output with only confident predictions
-- Threshold can be adjusted in config
-- Consumer can apply additional filtering using confidence scores
-
-### 4. Comprehensive Provenance
-Every code includes complete provenance:
-- Which method found it
-- What model was used (if LLM)
-- When it was inferred
-- Input hash for reproducibility
-- HCPCS reference version
-
-This enables:
-- Reproducing historical results
-- Debugging issues
-- Compliance and regulatory requirements
-
-## Evaluation
-
-To evaluate against ground truth labels:
 ```python
-import json
-import pandas as pd
+# Example: RAG method
+class RAGMethod(InferenceMethod):
+    def infer(self, policy_text: str) -> List[Evidence]:
+        # Implementation
+        return evidences
 
-# Load results and labels
-results = json.load(open('inferred_codes.json'))
-labels_df = pd.read_csv('policies_cleaned_labels.csv')
-
-# Compare inferred vs. ground truth codes
-# Calculate precision, recall, F1 score
-# ...
+# Add to pipeline (run_pipeline.py)
+methods.append(RAGMethod(vector_db, hcpcs_df))
 ```
 
-## License
-
-Proprietary - Policybot Assessment
-
-## Contact
-
-For questions: hello@policybot.app
+**Output schema unchanged** - v1 and v2 consumers continue working!

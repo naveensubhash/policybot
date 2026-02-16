@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 
 @dataclass
@@ -11,6 +11,7 @@ class Evidence:
     raw_output: str
     normalized_confidence: float
     metadata: Dict[str, Any] = field(default_factory=dict)
+    decision_trace: Optional[List[str]] = None  # ← NEW
 
 
 @dataclass
@@ -20,6 +21,7 @@ class FinalCode:
     aggregated_confidence: float
     justification: str
     provenance: Dict[str, Any] = field(default_factory=dict)
+    decision_trace: Optional[List[str]] = None  # ← NEW
 
 
 @dataclass

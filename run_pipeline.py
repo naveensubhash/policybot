@@ -5,7 +5,6 @@ from src.data.hcpcs_loader import load_hcpcs
 from src.data.policy_loader import load_policies
 from src.methods.mock_llm_method import MockLLMMethod
 from src.methods.direct_match_groq_method import DirectMatchGroqMethod
-from src.methods.rag_groq_method import RAGGroqMethod
 from src.pipeline.inference_engine import InferenceEngine
 
 
@@ -18,6 +17,7 @@ def serialize_result(result, row_idx):
                 "code": code.code,
                 "confidence": round(code.aggregated_confidence, 3),
                 "justification": code.justification,
+                "decision_trace": code.decision_trace,  # ← NEW (will be None for mock, array for LLM)
                 "provenance": {
                     **code.provenance,
                     "runtime": {

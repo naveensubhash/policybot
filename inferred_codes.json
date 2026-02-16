@@ -6,6 +6,7 @@
         "code": "G0480",
         "confidence": 0.85,
         "justification": "Found 2 matching keywords (1 medical terms: drug + classes) between policy and HCPCS G0480: 'Drug test def 1-7 classes'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -22,9 +23,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.318553",
+            "inference_timestamp": "2026-02-16T08:03:40.948919",
             "pipeline_version": "1.0",
-            "run_id": "fb9b7ab6-3230-4cd9-a7a2-1e3ca581fa78"
+            "run_id": "7ab4a492-45c8-4441-8e50-dba40d9fbafa"
           },
           "input": {
             "policy_text_hash": "48a17e8a502a8e12fee926bc941d709034a92f3129a93c7d184b6ba7da535afa"
@@ -35,6 +36,7 @@
         "code": "G0481",
         "confidence": 0.85,
         "justification": "Found 2 matching keywords (1 medical terms: drug + classes) between policy and HCPCS G0481: 'Drug test def 8-14 classes'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -51,9 +53,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.318553",
+            "inference_timestamp": "2026-02-16T08:03:40.948919",
             "pipeline_version": "1.0",
-            "run_id": "fb9b7ab6-3230-4cd9-a7a2-1e3ca581fa78"
+            "run_id": "7ab4a492-45c8-4441-8e50-dba40d9fbafa"
           },
           "input": {
             "policy_text_hash": "48a17e8a502a8e12fee926bc941d709034a92f3129a93c7d184b6ba7da535afa"
@@ -64,6 +66,7 @@
         "code": "G0482",
         "confidence": 0.85,
         "justification": "Found 2 matching keywords (1 medical terms: drug + classes) between policy and HCPCS G0482: 'Drug test def 15-21 classes'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -80,9 +83,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.318553",
+            "inference_timestamp": "2026-02-16T08:03:40.948919",
             "pipeline_version": "1.0",
-            "run_id": "fb9b7ab6-3230-4cd9-a7a2-1e3ca581fa78"
+            "run_id": "7ab4a492-45c8-4441-8e50-dba40d9fbafa"
           },
           "input": {
             "policy_text_hash": "48a17e8a502a8e12fee926bc941d709034a92f3129a93c7d184b6ba7da535afa"
@@ -93,6 +96,7 @@
         "code": "G0483",
         "confidence": 0.85,
         "justification": "Found 2 matching keywords (1 medical terms: drug + classes) between policy and HCPCS G0483: 'Drug test def 22+ classes'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -109,9 +113,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.318553",
+            "inference_timestamp": "2026-02-16T08:03:40.948919",
             "pipeline_version": "1.0",
-            "run_id": "fb9b7ab6-3230-4cd9-a7a2-1e3ca581fa78"
+            "run_id": "7ab4a492-45c8-4441-8e50-dba40d9fbafa"
           },
           "input": {
             "policy_text_hash": "48a17e8a502a8e12fee926bc941d709034a92f3129a93c7d184b6ba7da535afa"
@@ -135,6 +139,7 @@
         "code": "G0480",
         "confidence": 0.95,
         "justification": "Found 2 matching keywords (2 medical terms: drug, test) between policy and HCPCS G0480: 'Drug test def 1-7 classes'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -151,9 +156,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
+            "inference_timestamp": "2026-02-16T08:03:41.506535",
             "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
+            "run_id": "360d4d90-7edd-4767-b8af-fbe1cc5a11e2"
           },
           "input": {
             "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
@@ -164,6 +169,7 @@
         "code": "G0481",
         "confidence": 0.95,
         "justification": "Found 2 matching keywords (2 medical terms: drug, test) between policy and HCPCS G0481: 'Drug test def 8-14 classes'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -180,9 +186,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
+            "inference_timestamp": "2026-02-16T08:03:41.506535",
             "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
+            "run_id": "360d4d90-7edd-4767-b8af-fbe1cc5a11e2"
           },
           "input": {
             "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
@@ -193,6 +199,7 @@
         "code": "G0482",
         "confidence": 0.95,
         "justification": "Found 2 matching keywords (2 medical terms: drug, test) between policy and HCPCS G0482: 'Drug test def 15-21 classes'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -209,9 +216,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
+            "inference_timestamp": "2026-02-16T08:03:41.506535",
             "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
+            "run_id": "360d4d90-7edd-4767-b8af-fbe1cc5a11e2"
           },
           "input": {
             "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
@@ -222,6 +229,7 @@
         "code": "G0483",
         "confidence": 0.95,
         "justification": "Found 2 matching keywords (2 medical terms: drug, test) between policy and HCPCS G0483: 'Drug test def 22+ classes'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -238,9 +246,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
+            "inference_timestamp": "2026-02-16T08:03:41.506535",
             "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
+            "run_id": "360d4d90-7edd-4767-b8af-fbe1cc5a11e2"
           },
           "input": {
             "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
@@ -251,6 +259,7 @@
         "code": "U0002",
         "confidence": 0.95,
         "justification": "Found 2 matching keywords (2 medical terms: lab, test) between policy and HCPCS U0002: 'Covid-19 lab test non-cdc'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -267,9 +276,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
+            "inference_timestamp": "2026-02-16T08:03:41.506535",
             "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
+            "run_id": "360d4d90-7edd-4767-b8af-fbe1cc5a11e2"
           },
           "input": {
             "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
@@ -280,6 +289,7 @@
         "code": "82950",
         "confidence": 0.95,
         "justification": "Found 3 matching keywords (1 medical terms: test + billed, code) between policy and HCPCS 82950: 'Glucose test [only when billed with ICD-10-CM code Z13.1]'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -296,9 +306,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
+            "inference_timestamp": "2026-02-16T08:03:41.506535",
             "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
+            "run_id": "360d4d90-7edd-4767-b8af-fbe1cc5a11e2"
           },
           "input": {
             "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
@@ -309,6 +319,7 @@
         "code": "82951",
         "confidence": 0.95,
         "justification": "Found 3 matching keywords (1 medical terms: test + billed, code) between policy and HCPCS 82951: 'Glucose tolerance test (GTT) [only when billed with ICD-10-CM code Z13.1]'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -325,9 +336,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
+            "inference_timestamp": "2026-02-16T08:03:41.506535",
             "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
+            "run_id": "360d4d90-7edd-4767-b8af-fbe1cc5a11e2"
           },
           "input": {
             "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
@@ -338,6 +349,7 @@
         "code": "78195",
         "confidence": 0.85,
         "justification": "Found 2 matching keywords (1 medical terms: imaging + system) between policy and HCPCS 78195: 'Lymph system imaging'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -354,9 +366,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
+            "inference_timestamp": "2026-02-16T08:03:41.506535",
             "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
+            "run_id": "360d4d90-7edd-4767-b8af-fbe1cc5a11e2"
           },
           "input": {
             "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
@@ -367,6 +379,7 @@
         "code": "78226",
         "confidence": 0.85,
         "justification": "Found 2 matching keywords (1 medical terms: imaging + system) between policy and HCPCS 78226: 'Hepatobiliary system imaging'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -383,9 +396,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
+            "inference_timestamp": "2026-02-16T08:03:41.506535",
             "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
+            "run_id": "360d4d90-7edd-4767-b8af-fbe1cc5a11e2"
           },
           "input": {
             "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
@@ -396,6 +409,7 @@
         "code": "78300",
         "confidence": 0.85,
         "justification": "Found 2 matching keywords (1 medical terms: imaging + area) between policy and HCPCS 78300: 'Bone imaging limited area'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -412,9 +426,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
+            "inference_timestamp": "2026-02-16T08:03:41.506535",
             "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
+            "run_id": "360d4d90-7edd-4767-b8af-fbe1cc5a11e2"
           },
           "input": {
             "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
@@ -425,6 +439,7 @@
         "code": "78305",
         "confidence": 0.85,
         "justification": "Found 2 matching keywords (1 medical terms: imaging + multiple) between policy and HCPCS 78305: 'Bone imaging multiple areas'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -441,9 +456,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
+            "inference_timestamp": "2026-02-16T08:03:41.506535",
             "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
+            "run_id": "360d4d90-7edd-4767-b8af-fbe1cc5a11e2"
           },
           "input": {
             "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
@@ -454,6 +469,7 @@
         "code": "78999",
         "confidence": 0.85,
         "justification": "Found 2 matching keywords (1 medical terms: diagnostic + exam) between policy and HCPCS 78999: 'Nuclear diagnostic exam'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -470,9 +486,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
+            "inference_timestamp": "2026-02-16T08:03:41.506535",
             "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
+            "run_id": "360d4d90-7edd-4767-b8af-fbe1cc5a11e2"
           },
           "input": {
             "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
@@ -483,6 +499,7 @@
         "code": "C8001",
         "confidence": 0.85,
         "justification": "Found 2 matching keywords (1 medical terms: imaging + preop) between policy and HCPCS C8001: '3D anat seg imaging preop'",
+        "decision_trace": null,
         "provenance": {
           "method": {
             "name": "mock_llm_reasoning",
@@ -499,9 +516,9 @@
             "type": "mock"
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
+            "inference_timestamp": "2026-02-16T08:03:41.506535",
             "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
+            "run_id": "360d4d90-7edd-4767-b8af-fbe1cc5a11e2"
           },
           "input": {
             "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
@@ -511,7 +528,13 @@
       {
         "code": "G0288",
         "confidence": 0.8,
-        "justification": "This code is relevant because it pertains to a specific medical procedure (reconstruction for surgical planning) that may require modifier usage as outlined in the policy.",
+        "justification": "This code is relevant because it pertains to surgical planning, which is a key aspect of the policy's focus on modifier usage for professional services.",
+        "decision_trace": [
+          "Identified key phrase 'surgical plan' in policy text",
+          "Recognized the importance of modifier usage in surgical planning",
+          "Matched G0288 to the concept of reconstruction for surgical planning",
+          "Considered the policy's emphasis on accurate claims submissions and coding guidelines"
+        ],
         "provenance": {
           "method": {
             "name": "direct_match_groq",
@@ -525,41 +548,12 @@
           "model": {
             "name": "llama-3.3-70b-versatile",
             "provider": "groq",
-            "tokens_used": 1248
+            "tokens_used": 1358
           },
           "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
+            "inference_timestamp": "2026-02-16T08:03:41.506535",
             "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
-          },
-          "input": {
-            "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
-          }
-        }
-      },
-      {
-        "code": "G2251",
-        "confidence": 0.7,
-        "justification": "This code is relevant because it involves a brief medical check-in, which may necessitate the use of modifiers to accurately describe the service provided, as discussed in the policy.",
-        "provenance": {
-          "method": {
-            "name": "direct_match_groq",
-            "type": "llm",
-            "version": "1.0"
-          },
-          "reference_data": {
-            "hcpcs_version": "2026.01",
-            "hcpcs_description": "Brief chkin, 5-10, non-e/m"
-          },
-          "model": {
-            "name": "llama-3.3-70b-versatile",
-            "provider": "groq",
-            "tokens_used": 1248
-          },
-          "runtime": {
-            "inference_timestamp": "2026-02-16T07:38:01.870690",
-            "pipeline_version": "1.0",
-            "run_id": "579b87bf-ece5-4716-a22b-d016de79547a"
+            "run_id": "360d4d90-7edd-4767-b8af-fbe1cc5a11e2"
           },
           "input": {
             "policy_text_hash": "ddf04a913e190ca04591a1d4fa16f21031d46265cc72ca1e5f1fa2cb2bed41ac"
@@ -568,7 +562,7 @@
       }
     ],
     "summary": {
-      "total_codes_found": 15,
+      "total_codes_found": 14,
       "confidence_threshold": 0.65,
       "methods_used": [
         "mock_llm_reasoning",

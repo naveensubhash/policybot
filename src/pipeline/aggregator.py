@@ -61,34 +61,31 @@ def aggregate(evidences: List[Evidence], hcpcs_df: pd.DataFrame) -> List[FinalCo
             }
         }
         
-        # Add model info if this was an LLM method
+        # Add model info (works for both mock and LLM methods)
         if best_evidence.metadata.get("api_provider"):
-            # Real LLM method (Groq, OpenAI, etc.)
+            # Real LLM method
             provenance["model"] = {
                 "name": best_evidence.metadata.get("model_name"),
                 "provider": best_evidence.metadata.get("api_provider"),
                 "tokens_used": best_evidence.metadata.get("total_tokens")
             }
-        elif best_evidence.metadata.get("model_name"):
-            # Mock/deterministic method with model info
+        else:
+            # Mock/deterministic method
             provenance["model"] = {
-                "name": best_evidence.metadata["model_name"],
+                "name": best_evidence.metadata.get("model_name"),
                 "version": best_evidence.metadata.get("model_version"),
                 "type": "mock"
             }
-        else:
-            # No model info available
-            provenance["model"] = None
-
         
-        # Create FinalCode - NO 'selected' parameter!
+        # Create FinalCode with decision_trace
         final_codes.append(
             FinalCode(
                 code=code,
                 code_description=code_description,
                 aggregated_confidence=max_conf,
                 justification=best_evidence.raw_output,
-                provenance=provenance
+                provenance=provenance,
+                decision_trace=best_evidence.decision_trace  # ← NEW
             )
         )
     
